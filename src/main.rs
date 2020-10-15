@@ -29,7 +29,7 @@ fn main() {
     let count = unsafe { 
         mystrlen(c_string.as_ptr()) 
     };*/
-    //let c2_string:CCHAR = CCHAR::new("DSN=dashdb;DATABASE=RS22DDS2;hostname=rs22.rocketsoftware.com;PORT=3720;UID=ts5612;PWD=mar@2019;").expect("failed");
+    
 
     unsafe{
         let mut hdbc= core::ptr::null_mut();
@@ -38,9 +38,9 @@ fn main() {
         let mut dsn = String::new();
         dsn.push_str("dashdb");
         let mut uid = String::new();
-        uid.push_str("db2admin");
+        uid.push_str("dummy");
         let mut pwd = String::new();
-        pwd.push_str("gr8tcode!");
+        pwd.push_str("dummy");
         let mut cliRC;
         let mut out = core::ptr::null_mut();
         cliRC = SQLAllocHandle(SQL_HANDLE_ENV as i16,
