@@ -1,46 +1,21 @@
-// c_from_rust/src/main.rs
-
 #![allow(non_snake_case, non_camel_case_types, non_upper_case_globals, dead_code, improper_ctypes)]
 
 use ::CCODE::SQLConnect;
-use CCODE::{SQLAllocHandle, SQL_HANDLE_DBC, SQL_HANDLE_ENV, SQL_SUCCESS, SQLDisconnect, SQLFreeHandle, SQLGetInfo, SQLSMALLINT, SQL_DATA_SOURCE_NAME, SQLGetFunctions, SQL_API_SQLGETINFO, SQLUSMALLINT, SQL_TRUE};
+use CCODE::{SQLAllocHandle, SQL_HANDLE_DBC, SQL_HANDLE_ENV, SQL_SUCCESS, SQLDisconnect, SQLFreeHandle, SQLGetInfo, SQLSMALLINT, SQL_DATA_SOURCE_NAME, SQLGetFunctions, SQL_API_SQLGETINFO, SQLUSMALLINT, SQL_TRUE, SQLExecDirect, SQL_NTS, SQLCHAR, SQLSetConnectAttr, SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_ON, SQLPOINTER, SQL_HANDLE_STMT, SQL_NO_DATA_FOUND, SQLPrepare, SQLBindParameter, SQL_PARAM_INPUT, SQL_C_CHAR, SQL_VARCHAR, SQLExecute, SQLSetStmtAttr, SQL_ATTR_USE_LOAD_API, SQL_USE_LOAD_INSERT, SQL_ATTR_LOAD_INFO, SQLFetch, SQLFreeStmt, SQL_UNBIND, SQL_RESET_PARAMS, SQL_CLOSE};
 use std::ffi::CStr;
 
 
-/*#[link(name = "mystrlen")]
-extern "C" {
-    fn mystrlen(str: *const c_char) -> c_uint;
-}
-*/
-/*fn safe_mystrlen(str: &str) -> Option<u32> {
-    let c_string = match CString::new(str) { 
-        Ok(c) => c, 
-        Err(_) => return None 
-    };
-
-    unsafe { 
-        Some(mystrlen(c_string.as_ptr())) 
-    } 
-}*/
 
 fn main() {
 
-    /*let c_string = CString::new("C From Rust").expect("failed");
-    let count = unsafe { 
-        mystrlen(c_string.as_ptr()) 
-    };*/
-    
-
     unsafe{
         let mut hdbc= core::ptr::null_mut();
-        //let henv:*mut SQLHANDLE = ptr::null_mut();
-
         let mut dsn = String::new();
         dsn.push_str("dashdb");
         let mut uid = String::new();
-        uid.push_str("dummy");
+        uid.push_str("db2admin");
         let mut pwd = String::new();
-        pwd.push_str("dummy");
+        pwd.push_str("foobar");
         let mut cliRC;
         let mut out = core::ptr::null_mut();
         cliRC = SQLAllocHandle(SQL_HANDLE_ENV as i16,
@@ -75,6 +50,74 @@ fn main() {
             pwd.len() as i16
         );
         println!("Connected Successfully to database: {}",dsn);
+
+        let mut hstmt= core::ptr::null_mut();
+
+        SQLSetConnectAttr(hdbc,SQL_ATTR_AUTOCOMMIT as i32,SQL_AUTOCOMMIT_ON as SQLPOINTER,SQL_NTS);
+
+        println!("Allocating Statement Handle");
+        cliRC = SQLAllocHandle(SQL_HANDLE_STMT as SQLSMALLINT,
+                               hdbc,
+                               &mut hstmt);
+        if cliRC!= SQL_SUCCESS as i16 {
+            println!("--ERROR while getting hdbc. Status: {}",cliRC);
+            return;
+        }
+
+        println!("Dropping table if it exists.....");
+        let mut query = "DROP TABLE TEST";
+        let mut stmt = query.as_bytes().as_ptr() as *mut SQLCHAR;
+        cliRC = SQLExecDirect(hstmt,stmt,query.as_bytes().len() as i32);
+        println!("Dropping Table Result: {}",cliRC);
+
+        println!("Creating table.....");
+        query = "create table test(Col3 VARCHAR(7))";
+        stmt = query.as_bytes().as_ptr() as *mut SQLCHAR;
+        cliRC = SQLExecDirect(hstmt,stmt,query.as_bytes().len() as i32);
+        println!("Creating Table Result: {}",cliRC);
+
+        println!("Inserting Data.....");
+        query = "INSERT INTO TEST VALUES ('Binit')";
+        stmt = query.as_bytes().as_ptr() as *mut SQLCHAR;
+
+        cliRC = SQLExecDirect(hstmt,stmt,query.as_bytes().len() as i32);
+        println!("Inserting Data Result: {}",cliRC);
+
+
+        println!("Fetching Data.....");
+        query = "SELECT * FROM TEST";
+        stmt = query.as_bytes().as_ptr() as *mut SQLCHAR;
+        cliRC = SQLExecDirect(hstmt,stmt,query.as_bytes().len() as i32);
+        if cliRC == SQL_NO_DATA_FOUND as i16{
+            println!("No Data in Table");
+        } else{
+            println!("Fetching Data Result: {}",cliRC);
+        }
+
+        //After Select, Handle is missing so recreating the same.
+        println!("Allocating Statement Handle");
+        cliRC = SQLAllocHandle(SQL_HANDLE_STMT as SQLSMALLINT,
+                               hdbc,
+                               &mut hstmt);
+        if cliRC!= SQL_SUCCESS as i16 {
+            println!("--ERROR while getting hdbc. Status: {}",cliRC);
+            return;
+        }
+
+
+        println!("Dropping table.....");
+        query = "DROP TABLE TEST";
+        stmt = query.as_bytes().as_ptr() as *mut SQLCHAR;
+        cliRC = SQLExecDirect(hstmt,stmt,query.as_bytes().len() as i32);
+        println!("Dropping Table Result: {}",cliRC);
+
+
+        println!("Freeing Statement Handle");
+        SQLFreeHandle(SQL_HANDLE_STMT as i16,hstmt);
+        SQLFreeStmt(hstmt,SQL_UNBIND as u16);
+        SQLFreeStmt(hstmt,SQL_RESET_PARAMS as u16);
+        SQLFreeStmt(hstmt,SQL_CLOSE as u16);
+
         let dbInfoBuf = core::ptr::null_mut();
         let outlen:*mut SQLSMALLINT = core::ptr::null_mut();
         let supported:*mut SQLUSMALLINT = core::ptr::null_mut();
@@ -95,7 +138,4 @@ fn main() {
         println!("Freeing connection Handle");
         SQLFreeHandle(SQL_HANDLE_DBC as i16,hdbc);
     }
-
-    /*println!("c_string's length is {}", count);
-    println!("c_string's length is {:?}", safe_mystrlen("C From Rust"));*/
 }
