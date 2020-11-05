@@ -1,10 +1,20 @@
 [package]
-name = "Rust_C_Sample"
+name = "Rust_IBM_DB"
 version = "0.1.0"
 authors = ["Binit Kumar <bkumar@rocketsoftware.com>"]
+license = "MIT OR Apache-2.0"
+description = "A tool for DB2 connectivity using CLI Driver"
+readme = "README.md"
+homepage = "https://github.com/ibmdb/rust-ibm_db"
+repository = "https://github.com/ibmdb/rust-ibm_db"
+keywords = ["cli", "db2", "clidb2", "rustdb2"]
 edition = "2018"
 build = "build.rs"
 links = "db2app64"
+include = [
+    "**/*.rs",
+    "Cargo.toml",
+]
 
 [lib]
 name = "CCODE"
