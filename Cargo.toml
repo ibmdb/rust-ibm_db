@@ -1,5 +1,5 @@
 [package]
-name = "Rust_IBM_DB"
+name = "ibm_db"
 version = "0.1.0"
 authors = ["Binit Kumar <bkumar@rocketsoftware.com>"]
 license = "MIT OR Apache-2.0"
