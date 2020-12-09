@@ -8,7 +8,7 @@ checksum = "ed67cbde08356238e75fc4656be4749481eeffb09e19f320a25237d5221c985d"
 
 [[package]]
 name = "ibm_db"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "cc",
  "user32-sys",
