@@ -26,3 +26,12 @@ cc = "1.0"
 [dependencies]
 winapi = "0.2"
 user32-sys = "0.2"
+sys-info = "0.7.0"
+bitness = "0.4.0"
+error-chain = "0.12.4"
+tempfile = "3.1.0"
+reqwest = "0.10.10"
+#reqwest = { version = "0.10", features = ["json"] }
+tokio = { version = "0.2", features = ["full"] }
+futures = "0.3.8"
+zip = "0.5"

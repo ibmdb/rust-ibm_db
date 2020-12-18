@@ -1,20 +1,36 @@
 #![allow(non_snake_case, non_camel_case_types, non_upper_case_globals, dead_code, improper_ctypes)]
 
 use ::CCODE::SQLConnect;
-use CCODE::{SQLAllocHandle, SQL_HANDLE_DBC, SQL_HANDLE_ENV, SQL_SUCCESS, SQLDisconnect, SQLFreeHandle, SQLGetInfo, SQLSMALLINT, SQL_DATA_SOURCE_NAME, SQLGetFunctions, SQL_API_SQLGETINFO, SQLUSMALLINT, SQL_TRUE, SQLExecDirect, SQL_NTS, SQLCHAR, SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_ON, SQLPOINTER, SQL_HANDLE_STMT, SQL_NO_DATA_FOUND, SQLSetConnectAttr,SQLFreeStmt, SQL_UNBIND, SQL_RESET_PARAMS, SQL_CLOSE};
+use CCODE::{SQLAllocHandle, SQL_HANDLE_DBC, SQL_HANDLE_ENV, SQL_SUCCESS, SQLDisconnect, SQLFreeHandle, SQLGetInfo, SQLSMALLINT, SQL_DATA_SOURCE_NAME, SQLGetFunctions, SQL_API_SQLGETINFO, SQLUSMALLINT, SQL_TRUE, SQLExecDirect, SQL_NTS, SQLCHAR, SQLSetConnectAttr, SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_ON, SQLPOINTER, SQL_HANDLE_STMT, SQL_NO_DATA_FOUND, SQLFreeStmt, SQL_UNBIND, SQL_RESET_PARAMS, SQL_CLOSE};
 use std::ffi::CStr;
 
 
 fn main() {
+    connect(
+        "dashdb".parse().unwrap(),
+        "db2admin".parse().unwrap(),
+        "gr8tcode!".parse().unwrap()
+    )
+}
+
+fn connect(mut dsn : String, mut uid: String, mut pwd: String){
+
+    /*let c_string = CString::new("C From Rust").expect("failed");
+    let count = unsafe { 
+        mystrlen(c_string.as_ptr()) 
+    };*/
+    //let c2_string:CCHAR = CCHAR::new("DSN=dashdb;DATABASE=RS22DDS2;hostname=rs22.rocketsoftware.com;PORT=3720;UID=ts5612;PWD=mar@2019;").expect("failed");
 
     unsafe{
         let mut hdbc= core::ptr::null_mut();
-        let mut dsn = String::new();
-        dsn.push_str("dashdb");
-        let mut uid = String::new();
-        uid.push_str("db2admin");
-        let mut pwd = String::new();
-        pwd.push_str("foobar");
+        //let henv:*mut SQLHANDLE = ptr::null_mut();
+
+        //let mut dsn = String::new();
+        //dsn.push_str("dashdb");
+        //let mut uid = String::new();
+        //uid.push_str("db2admin");
+        //let mut pwd = String::new();
+        //pwd.push_str("gr8tcode!");
         let mut cliRC;
         let mut out = core::ptr::null_mut();
         cliRC = SQLAllocHandle(SQL_HANDLE_ENV as i16,
@@ -78,6 +94,19 @@ fn main() {
         println!("Inserting Data.....");
         query = "INSERT INTO TEST VALUES ('Binit')";
         stmt = query.as_bytes().as_ptr() as *mut SQLCHAR;
+        /*cliRC = SQLPrepare(hstmt,stmt,query.as_bytes().len() as i32);
+        println!("Insert Prepare Statement Result: {}",cliRC);
+        cliRC = SQLBindParameter(hstmt,
+                                1,
+                                    SQL_PARAM_INPUT as i16,
+                                    SQL_C_CHAR as i16,
+                                    SQL_VARCHAR as i16,
+                                        7,
+                                            0,
+                                                "Binit".as_bytes().as_ptr() as SQLPOINTER,
+                                        7,
+                                    7 as *mut i32);
+        println!("Insert Bind Parameter Result: {}",cliRC);*/
 
         cliRC = SQLExecDirect(hstmt,stmt,query.as_bytes().len() as i32);
         println!("Inserting Data Result: {}",cliRC);
