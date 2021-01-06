@@ -4,7 +4,8 @@ use std::env;
 use std::path::Path;
 use bitness::Bitness;
 use std::fs::File;
-use std::io::{Write, stdout, stdin};
+use std::io::{copy, Write, stdout, stdin};
+use tempfile::Builder;
 use futures::executor::block_on;
 use std::fs;
 use std::io;
@@ -81,6 +82,23 @@ async fn main() {
                     std::process::exit(0);
                 }
 
+            }else if os.contains("Linux"){
+                //If OS is LINUX, check corresponding arch and find the approp binary
+                let bitness = bitness::os_bitness().unwrap();
+                let os_arch = match bitness {
+                    Bitness::X86_32 => 32,
+                    Bitness::X86_64 => 64,
+                    _ => { 0 }
+                };
+                println!("This is a {} os & {} bit system.", os, os_arch);
+                if os_arch == 64 {
+                    cli_file_name = "linuxx64_odbc_cli.tar.gz";
+                } else if os_arch == 32{
+                    cli_file_name = "linuxx32_odbc_cli.tar.gz";
+                }else {
+                    println!("Unknown/Unsupported platform.");
+                    std::process::exit(0);
+                }
             }else{
                 println!("Unknown/Unsupported platform.");
                 std::process::exit(0);
@@ -186,7 +204,73 @@ async fn main() {
                 println!("Please set CGO_CFLAGS, CGO_LDFLAGS and LD_LIBRARY_PATH or DYLD_LIBRARY_PATH environment variables");
                 std::process::exit(0)
             }else{
-                //Follow the above steps of downloading the necessary binary file for linux.
+                //Follow the above steps of downloading the necessary binary file for linux or mac.
+                //*************
+                if os.contains("Darwin"){
+                    //If OS is Mac(Darwin), check corresponding arch and find the approp binary
+                    let bitness = bitness::os_bitness().unwrap();
+                    let os_arch = match bitness {
+                        Bitness::X86_32 => 32,
+                        Bitness::X86_64 => 64,
+                        _ => { 0 }
+                    };
+                    println!("This is a {} os & {} bit system.", os, os_arch);
+                    if os_arch == 64 {
+                        cli_file_name = "macos64_odbc_cli.tar.gz";
+                    } else {
+                        println!("Unknown/Unsupported platform.");
+                        std::process::exit(0);
+                    }
+
+                }else if os.contains("Linux"){
+                    //If OS is LINUX, check corresponding arch and find the approp binary
+                    let bitness = bitness::os_bitness().unwrap();
+                    let os_arch = match bitness {
+                        Bitness::X86_32 => 32,
+                        Bitness::X86_64 => 64,
+                        _ => { 0 }
+                    };
+                    println!("This is a {} os & {} bit system.", os, os_arch);
+                    if os_arch == 64 {
+                        cli_file_name = "linuxx64_odbc_cli.tar.gz";
+                    } else if os_arch == 32{
+                        cli_file_name = "linuxx32_odbc_cli.tar.gz";
+                    }else {
+                        println!("Unknown/Unsupported platform.");
+                        std::process::exit(0);
+                    }
+                }else{
+                    println!("Unknown/Unsupported platform.");
+                    std::process::exit(0);
+                }
+                //Download the binary
+                let mut file_url = "https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/".to_string();
+                file_url.push_str(cli_file_name);
+
+                println!("Downloading at {} from {} .......", env_path, file_url);
+
+                let future =
+                    download_file(&*env_path, &*file_url);
+                let err = block_on(future);
+
+                //Check if Download Successful.
+                //If error print error and details
+                if !err.is_ok() {
+                    println!("Error while downloading file: {}", err.err().unwrap());
+                    std::process::exit(4)
+                }
+
+                //Unzip the downloaded binary
+                let mut unzip_err = 0;
+                unzip_err = linux_untar(&*env_path, &*cli_file_name);
+
+                //Check if unzipping Successful.
+                //If error print error and details
+                if !(unzip_err == 0) {
+                    println!("Error while unzipping file");
+                    std::process::exit(4)
+                }
+                    //***************
             }
         }
 
