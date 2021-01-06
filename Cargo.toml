@@ -1,6 +1,6 @@
 [package]
 name = "ibm_db"
-version = "0.1.1"
+version = "0.1.2"
 authors = ["Binit Kumar <bkumar@rocketsoftware.com>"]
 license = "MIT OR Apache-2.0"
 description = "A tool for DB2 connectivity using CLI Driver"
@@ -35,3 +35,5 @@ reqwest = "0.10.10"
 tokio = { version = "0.2", features = ["full"] }
 futures = "0.3.8"
 zip = "0.5"
+flate2 = "1.0"
+tar = "0.4"

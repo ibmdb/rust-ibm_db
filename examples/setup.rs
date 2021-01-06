@@ -4,11 +4,12 @@ use std::env;
 use std::path::Path;
 use bitness::Bitness;
 use std::fs::File;
-use std::io::{copy, Write, stdout, stdin};
-use tempfile::Builder;
+use std::io::{Write, stdout, stdin};
 use futures::executor::block_on;
 use std::fs;
 use std::io;
+use flate2::read::GzDecoder;
+use tar::Archive;
 
 //Main function called for setup
 #[cfg(not(target_arch = "wasm32"))]
@@ -18,7 +19,8 @@ async fn main() {
     env_var_not_present = env::var("IBM_DB_HOM").is_err();
     let mut user_env_path = String::new();
     if env_var_not_present {
-        print!("Please enter the path where you need to download the cli driver binary and set as IBM_DB_HOME environment variable. ");
+        user_env_path = ".".parse().unwrap();
+        print!("Please enter the path where you need to download the cli driver binary and set as IBM_DB_HOME environment variable (LEAVE BLANK FOR CURRENT DIRECTORY): ");
         let _=stdout().flush();
         stdin().read_line(&mut user_env_path).expect("Did not enter a correct string");
         if let Some('\n')=user_env_path.chars().next_back() {
@@ -64,8 +66,27 @@ async fn main() {
                     cli_file_name = "ntx32_odbc_cli.zip";
                 }
                 println!("This is a {} os & {} bit system. Download file is: {}", os, os_arch, cli_file_name);
+            }else if os.contains("Darwin"){
+                //If OS is Mac(Darwin), check corresponding arch and find the approp binary
+                let bitness = bitness::os_bitness().unwrap();
+                let os_arch = match bitness {
+                    Bitness::X86_32 => 32,
+                    Bitness::X86_64 => 64,
+                    _ => { 0 }
+                };
+                println!("This is a {} os & {} bit system.", os, os_arch);
+                if os_arch == 64 {
+                    cli_file_name = "macos64_odbc_cli.tar.gz";
+                } else {
+                    println!("Unknown/Unsupported platform.");
+                    std::process::exit(0);
+                }
+
+            }else{
+                println!("Unknown/Unsupported platform.");
+                std::process::exit(0);
             }
-            //If OS is Linux, check corresponding arch and find the approp binary
+
             //TBD
             //Download the binary
             let mut file_url = "https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/".to_string();
@@ -85,7 +106,12 @@ async fn main() {
             }
 
             //Unzip the downloaded binary
-            let unzip_err = un_zipping(&*env_path, &*cli_file_name);
+            let mut unzip_err = 0;
+            if os.contains("Windows") {
+                unzip_err = un_zipping(&*env_path, &*cli_file_name);
+            }else{
+                unzip_err = linux_untar(&*env_path, &*cli_file_name);
+            }
             //Check if unzipping Successful.
             //If error print error and details
             if !(unzip_err == 0) {
@@ -138,7 +164,13 @@ async fn main() {
                 }
 
                 //Unzip the downloaded binary
-                let unzip_err = un_zipping(&*env_path, &*cli_file_name);
+                let mut unzip_err = 0;
+                if os.contains("Windows") {
+                    unzip_err = un_zipping(&*env_path, &*cli_file_name);
+                }else{
+                    unzip_err = linux_untar(&*env_path, &*cli_file_name);
+                }
+
                 //Check if unzipping Successful.
                 //If error print error and details
                 if !(unzip_err == 0) {
@@ -166,8 +198,6 @@ async fn main() {
 
 //Function to download the platform specific file
 async fn download_file(env_path: &str, file_url: &str) -> Result<(), Box<dyn std::error::Error>> {
-    //let tmp_dir = Builder::new().prefix("example").tempdir()?;
-    //let target = "https://www.rust-lang.org/logos/rust-logo-512x512.png";
     println!("\n\n****************************************\n\
             You are downloading a package which to be used by RUST module for IBM DB2/Informix.  \
             The module is licensed under the Apache License 2.0. \
@@ -225,10 +255,11 @@ fn un_zipping(env_path: &str, cli_file_name: &str) -> i32{
     for i in 0..archive.len() {
         let mut file = archive.by_index(i).unwrap();
 
-        let outpathtmp = match file.enclosed_name() {
+        let outpathtmp = file.name();
+        /*let outpathtmp = match file.enclosed_name() {
             Some(path) => path.to_owned(),
             None => continue,
-        };
+        };*/
         let outpath = copy_path.join(outpathtmp);
 
         {
@@ -271,5 +302,19 @@ fn un_zipping(env_path: &str, cli_file_name: &str) -> i32{
 }
 
 //Unzipping the file on Linux/UNIX
-fn linux_untar(env_path: &str, cli_file_name: &str){
+fn linux_untar(env_path: &str, cli_file_name: &str)-> i32{
+    if Path::new(env_path).join("/clidriver").exists() {
+        println!("clidriver already downloaded and unzipped.");
+        return 0;
+    }
+    let mut fname = String::from(env_path);
+    fname.push_str(cli_file_name);
+    println!("Untarring {}....",fname);
+    let fname = std::path::Path::new(env_path).join(cli_file_name);
+    let file = fs::File::open(&fname).unwrap();
+    let tar = GzDecoder::new(file);
+    let mut archive = Archive::new(tar);
+    archive.unpack(env_path);
+
+    return 0;
 }
