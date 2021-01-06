@@ -16,10 +16,9 @@ use tar::Archive;
 #[tokio::main]
 async fn main() {
     let mut env_var_not_present = false;
-    env_var_not_present = env::var("IBM_DB_HOM").is_err();
+    env_var_not_present = env::var("IBM_DB_HOME").is_err();
     let mut user_env_path = String::new();
     if env_var_not_present {
-        user_env_path = ".".parse().unwrap();
         print!("Please enter the path where you need to download the cli driver binary and set as IBM_DB_HOME environment variable (LEAVE BLANK FOR CURRENT DIRECTORY): ");
         let _=stdout().flush();
         stdin().read_line(&mut user_env_path).expect("Did not enter a correct string");
@@ -29,14 +28,16 @@ async fn main() {
         if let Some('\r')=user_env_path.chars().next_back() {
             user_env_path.pop();
         }
+        if user_env_path.len()==0 {
+            user_env_path = ".".parse().unwrap();
+        }
         println!("Path Entered by you: {}",user_env_path);
     }
     let cli_path: &str = "/clidriver";
-    let env_path = env::var("IBM_DB_HOM").unwrap_or(user_env_path);
+    let env_path = env::var("IBM_DB_HOME").unwrap_or(user_env_path);
     let mut value = String::new();
     value.push_str(&env_path);
     value.push_str(cli_path);
-    //println!("{}",env_var_not_present);
     let os = sys_info::os_type().unwrap_or("none".to_string());
     let mut cli_file_name = "";
     println!("clidriver path: {}",value);
@@ -44,9 +45,7 @@ async fn main() {
         if Path::new(&value).exists() {
             println!("clidriver is already present in this path: {}", value);
             //Add to IBM_DB_HOME environment variable
-            env::set_var("IBM_DB_HOM", &env_path);
-            //let env_path_tmp = env::var("IBM_DB_HOM").unwrap_or("C:\\wrong".to_string());
-            //println!("{}",env_path_tmp);
+            env::set_var("IBM_DB_HOME", &env_path);
             //Ask user to add to PATH
             println!("Please add this path to PATH & IBM_DB_HOME environment variable if not set.");
             std::process::exit(0)
@@ -87,7 +86,6 @@ async fn main() {
                 std::process::exit(0);
             }
 
-            //TBD
             //Download the binary
             let mut file_url = "https://public.dhe.ibm.com/ibmdl/export/pub/software/data/db2/drivers/odbc_cli/".to_string();
             file_url.push_str(cli_file_name);
@@ -119,9 +117,9 @@ async fn main() {
                 std::process::exit(4)
             }
             //Set the environment variable
-            env::set_var("IBM_DB_HOM", env_path);
+            env::set_var("IBM_DB_HOME", env_path);
             //Validate and then exit
-            let env_path_tmp = env::var("IBM_DB_HOM").unwrap_or("Unable to Set Path. Please set.".to_string());
+            let env_path_tmp = env::var("IBM_DB_HOME").unwrap_or("Unable to Set Path. Please set.".to_string());
             println!("IBM_DB_HOME set to {}",env_path_tmp);
         }
     } else {
@@ -256,10 +254,6 @@ fn un_zipping(env_path: &str, cli_file_name: &str) -> i32{
         let mut file = archive.by_index(i).unwrap();
 
         let outpathtmp = file.name();
-        /*let outpathtmp = match file.enclosed_name() {
-            Some(path) => path.to_owned(),
-            None => continue,
-        };*/
         let outpath = copy_path.join(outpathtmp);
 
         {
@@ -286,16 +280,6 @@ fn un_zipping(env_path: &str, cli_file_name: &str) -> i32{
             let mut outfile = fs::File::create(&outpath).unwrap();
             io::copy(&mut file, &mut outfile).unwrap();
         }
-
-        // Get and Set permissions
-        #[cfg(unix)]
-            {
-                use std::os::unix::fs::PermissionsExt;
-
-                if let Some(mode) = file.unix_mode() {
-                    fs::set_permissions(&outpath, fs::Permissions::from_mode(mode)).unwrap();
-                }
-            }
     }
 
     return 0;
@@ -307,10 +291,8 @@ fn linux_untar(env_path: &str, cli_file_name: &str)-> i32{
         println!("clidriver already downloaded and unzipped.");
         return 0;
     }
-    let mut fname = String::from(env_path);
-    fname.push_str(cli_file_name);
-    println!("Untarring {}....",fname);
     let fname = std::path::Path::new(env_path).join(cli_file_name);
+    println!("Untarring {}....", fname.display());
     let file = fs::File::open(&fname).unwrap();
     let tar = GzDecoder::new(file);
     let mut archive = Archive::new(tar);
