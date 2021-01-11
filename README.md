@@ -6,7 +6,7 @@ Confirm by typing below in command cprompt:
 RUST Driver:
 Tested on rustc 1.42.0 and above.
 
-Also, current pre-requisite is Platform specific CLI Driver downloaded in system to be used in [build.rs](build.rs) file.
+Update CLI driver path in [build.rs](build.rs) file in case CLI driver already downloadd/present in system.
 
 If CLI driver not present, kindly use [setup.rs](examples/setup.rs) file to download and configure the same.
 
