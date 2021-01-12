@@ -10,7 +10,7 @@ repository = "https://github.com/ibmdb/rust-ibm_db"
 keywords = ["cli", "db2", "clidb2", "rustdb2"]
 edition = "2018"
 build = "build.rs"
-links = "db2app64"
+links = "db2"
 include = [
     "**/*.rs",
     "Cargo.toml",
