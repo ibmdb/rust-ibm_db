@@ -24,10 +24,10 @@ cargo run
 
 MACOS:
 If you get an error i.e. "dyld: Library not loaded: libdb2.dylib"
-Run the following command(Where replace the <RUST_PROGRAM_HOME> with the path of your rust program root folder):
+Run the following command(Where replace the <RUST_CRATE_LIB> with the path of your rust program root folder):
 
 ```
-install_name_tool -change libdb2.dylib $IBM_DB_HOME/lib/libdb2.dylib <RUST_PROGRAM_HOME>/target/debug/Rust_C_Sample
+install_name_tool -change libdb2.dylib $IBM_DB_HOME/lib/libdb2.dylib <RUST_CRATE_LIB>/target/debug/ibm_db
 
 ```
 
