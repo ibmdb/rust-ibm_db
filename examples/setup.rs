@@ -1,12 +1,14 @@
 #![allow(unused_assignments)]
+#![allow(unused_must_use)]
+#![allow(unused_mut)]
+
 extern crate bitness;
 
 use std::env;
 use std::path::Path;
 use bitness::Bitness;
 use std::fs::File;
-use std::io::{copy, Write, stdout, stdin};
-use tempfile::Builder;
+use std::io::{Write, stdout, stdin};
 use futures::executor::block_on;
 use std::fs;
 use std::io;
