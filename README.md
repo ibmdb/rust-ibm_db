@@ -24,6 +24,22 @@ If CLI Driver is not installed run the below command and it will be installed:
 cargo run --package ibm_db --example setup
 ```
 
+> NOTE: In order for the test program to run, DSN needs to be configured. Update the db2dsdriver.cfg file(present in /clidriver/cfg folder under CLI driver path) with the requisite details.
+```
+e.g.
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
+<configuration>
+  <dsncollection>
+	<dsn alias="dashdb4" host="test@test.com" name="FOO" port="0000"/>
+	</dsncollection>
+
+  <databases>
+	<database host="test@test.com" name="FOO" port="0000"/>
+	</databases>
+
+</configuration>
+```
+
 ## How to Install
 ```
 Include ibm_db in your cargo.toml with latest version.
