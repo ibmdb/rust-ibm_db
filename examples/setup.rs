@@ -1,3 +1,4 @@
+#![allow(unused_assignments)]
 extern crate bitness;
 
 use std::env;

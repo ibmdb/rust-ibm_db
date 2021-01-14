@@ -8,7 +8,7 @@ Interface for Rust to DB2 for z/OS, DB2 for LUW, DB2 for i.
 
 ## Prerequisite
 
-RUST should be installed(Rust version should be >=1.45)
+> RUST should be installed(Rust version should be >=1.45)
 Confirm by typing below in command prompt:
 
 ```
@@ -16,7 +16,13 @@ Confirm by typing below in command prompt:
 
 ```
 
-Git should be installed in your system.
+> Git should be installed in your system.
+
+> CLI Driver should be downloaded in your system and IBM_DB_PATH, LD_LIBRARY_PATH should be set to point to CLI Driver folder.
+If CLI Driver is not installed run the below command and it will be installed:
+```
+cargo run --package ibm_db --example setup
+```
 
 ## How to Install
 ```
@@ -29,7 +35,8 @@ If you already have a cli driver available in your system, add the path of the s
 Example: set/export PATH = /IBM/IBM DATA SERVER DRIVER/bin
 
 
-If you do not have a clidriver in your system, go to examples folder where rust_ibm_db is downloaded in your system (Example: /Users/uname/rust_ibm_db/installer) and run setup.rs file (cargo run --package ibm_db --example setup).
+If you do not have a clidriver in your system, go to examples folder where rust_ibm_db is downloaded in your system (Example: /Users/uname/rust_ibm_db/installer) and run setup.rs file: 
+> cargo run --package ibm_db --example setup
 
 where uname is the username
 
