@@ -1,3 +1,7 @@
+//! # IBM_DB
+//!
+//! `ibm_db` is a library for connecting to DB2.
+
 // suppress for the whole module with inner attribute...
 #![allow(non_snake_case, non_camel_case_types, non_upper_case_globals, dead_code, improper_ctypes)]
 #[repr(C)]

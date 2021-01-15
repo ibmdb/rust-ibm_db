@@ -1,6 +1,6 @@
 [package]
 name = "ibm_db"
-version = "0.1.4"
+version = "0.1.6"
 authors = ["Binit Kumar <bkumar@rocketsoftware.com>"]
 license = "MIT OR Apache-2.0"
 description = "A tool for DB2 connectivity using CLI Driver"
@@ -13,11 +13,11 @@ build = "build.rs"
 links = "db2"
 include = [
     "**/*.rs",
-    "Cargo.toml",
+    "Cargo.toml"
 ]
 
 [lib]
-name = "CCODE"
+name = "ibm_db"
 path = "src/lib.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
