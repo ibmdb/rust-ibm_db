@@ -1,7 +1,6 @@
 #![allow(unused_assignments)]
 #![allow(unused_must_use)]
 #![allow(unused_mut)]
-
 extern crate bitness;
 
 use std::env;
@@ -42,14 +41,16 @@ async fn main() {
     let mut value = String::new();
     value.push_str(&env_path);
     value.push_str(cli_path);
+
     let os = sys_info::os_type().unwrap_or("none".to_string());
     let mut cli_file_name = "";
-    println!("clidriver path: {}",value);
     if env_var_not_present {
         if Path::new(&value).exists() {
-            println!("clidriver is already present in this path: {}", value);
+            println!("CLI Driver is already present in this path: {}", value);
+
             //Add to IBM_DB_HOME environment variable
             env::set_var("IBM_DB_HOME", &env_path);
+
             //Ask user to add to PATH
             println!("Please add this path to PATH & IBM_DB_HOME environment variable if not set.");
             std::process::exit(0)
@@ -131,12 +132,14 @@ async fn main() {
             }else{
                 unzip_err = linux_untar(&*env_path, &*cli_file_name);
             }
+
             //Check if unzipping Successful.
             //If error print error and details
             if !(unzip_err == 0) {
                 println!("Error while unzipping file");
                 std::process::exit(4)
             }
+
             //Set the environment variable
             env::set_var("IBM_DB_HOME", env_path);
             //Validate and then exit
@@ -226,7 +229,7 @@ async fn main() {
                     }
 
                 }else if os.contains("Linux"){
-                    //If OS is LINUX, check corresponding arch and find the approp binary
+                    //If OS is LINUX, check corresponding arch and find the appropriate binary
                     let bitness = bitness::os_bitness().unwrap();
                     let os_arch = match bitness {
                         Bitness::X86_32 => 32,
@@ -273,7 +276,6 @@ async fn main() {
                     println!("Error while unzipping file");
                     std::process::exit(4)
                 }
-                    //***************
             }
         }
 
@@ -341,6 +343,7 @@ fn un_zipping(env_path: &str, cli_file_name: &str) -> i32{
         let mut file = archive.by_index(i).unwrap();
 
         let outpathtmp = file.name();
+
         let outpath = copy_path.join(outpathtmp);
 
         {
