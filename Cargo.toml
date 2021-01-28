@@ -1,6 +1,6 @@
 [package]
 name = "ibm_db"
-version = "0.1.7"
+version = "0.1.8"
 authors = ["Binit Kumar <bkumar@rocketsoftware.com>"]
 license = "MIT OR Apache-2.0"
 description = "A tool for DB2 connectivity using CLI Driver"
@@ -23,6 +23,18 @@ path = "src/lib.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [build-dependencies]
 cc = "1.0"
+winapi = "0.2"
+user32-sys = "0.2"
+sys-info = "0.7.0"
+bitness = "0.4.0"
+error-chain = "0.12.4"
+tempfile = "3.1.0"
+reqwest = "0.10.10"
+tokio = { version = "0.2", features = ["full"] }
+futures = "0.3.8"
+zip = "0.5"
+flate2 = "1.0"
+tar = "0.4"
 [dependencies]
 winapi = "0.2"
 user32-sys = "0.2"
@@ -37,3 +49,9 @@ futures = "0.3.8"
 zip = "0.5"
 flate2 = "1.0"
 tar = "0.4"
+#Added Later
+odbc-safe = "0.5.0"
+odbc-sys = "0.8.2"
+log = "0.4.1"
+encoding_rs = "0.8.14"
+prettytable-rs = "^0.8"
