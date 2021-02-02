@@ -16,10 +16,20 @@ Confirm by typing below in command prompt:
 
 ```
 
-> Git should be installed in your system.
+> We'll assume that you've installed Git, forked [rust-ibm_db](https://github.com/ibmdb/rust-ibm_db.git), and cloned the forked repo to your PC.
+>
+> We'll use the command line interface to interact with Git i.e.
+```
+git clone https://github.com/ibmdb/rust-ibm_db
+```
+> 
+> There are also a number of GUIs and IDE integrations that can generally do the same things.
+> 
+> If you've cloned your fork, then you will be able to reference it with origin in your local repo. 
 
 > CLI Driver should be downloaded in your system and IBM_DB_PATH, LD_LIBRARY_PATH should be set to point to CLI Driver folder.
-If CLI Driver is not installed run the below command and it will be installed:
+> 
+> If CLI Driver is not installed run the below command once you checkout the GIT repo and it will be installed:
 ```
 cargo run --package ibm_db --example setup
 ```

@@ -37,7 +37,7 @@ async fn main() {
         println!("Path Entered by you: {}",user_env_path);
     }
     let cli_path: &str = "/clidriver";
-    let env_path = env::var("IBM_DB_HOME").unwrap_or(user_env_path);
+    let mut env_path = env::var("IBM_DB_HOME").unwrap_or(user_env_path);
     let mut value = String::new();
     value.push_str(&env_path);
     value.push_str(cli_path);
@@ -141,6 +141,7 @@ async fn main() {
             }
 
             //Set the environment variable
+            env_path.push_str("/clidriver");
             env::set_var("IBM_DB_HOME", env_path);
             //Validate and then exit
             let env_path_tmp = env::var("IBM_DB_HOME").unwrap_or("Unable to Set Path. Please set.".to_string());
