@@ -58,22 +58,14 @@ e.g.
 </configuration>
 ```
 
-Include ibm_db in your cargo.toml with latest version.
-Crates.io link: https://crates.io/crates/ibm_db
+Include ibm_db in your cargo.toml with latest version from [Crates.io](https://crates.io/crates/ibm_db)
 
-OR simply include this project in your RUST project.
+OR 
 
-If you already have a cli driver available in your system, add the path of the same to your IBM_DB_HOME, PATH and LD_LIBRARY_PATH
-Example: set/export PATH = /IBM/IBM DATA SERVER DRIVER/bin
+Simply include this project in your RUST project.
 
-
-If you do not have a clidriver in your system, go to examples folder under rust_ibm_db which is checked out from GIT in your system (Example: /Users/uname/rust_ibm_db/examples) and run setup.rs file: 
-> cargo run --package ibm_db --example setup
-
-
-Above command will download clidriver.
-
-Add the path of the clidriver downloaded to your Path on
+####NOTE:
+In case it is not already set, add the path of the CLI Driver downloaded as above to your Path on
 Windows/LINUX/MACOS environment variable i.e. IBM_DB_HOME, PATH and LD_LIBRARY_PATH or DYLD_LIBRARY_PATH depending on Windows/LINUX/MACOS
 e.g:
 ```
@@ -94,14 +86,14 @@ To know more about server based licensing viz db2connectactivate, follow below l
 * [Activating the license certificate file for DB2 Connect Unlimited Edition](https://www.ibm.com/developerworks/community/blogs/96960515-2ea1-4391-8170-b0515d08e4da/entry/unlimited_licensing_in_non_java_drivers_using_db2connectactivate_utlility1?lang=en).
 * [Unlimited licensing using db2connectactivate utility](https://www.ibm.com/developerworks/community/blogs/96960515-2ea1-4391-8170-b0515d08e4da/entry/unlimited_licensing_in_non_java_drivers_using_db2connectactivate_utlility1?lang=en.)
 
-## How to run sample program
+### How to run sample program:
 
 To run the sample i.e. **main.rs** simply execute:- 
 
 ```
 cargo run
 ```
-## You can also run other Sample Programs under examples folder using:
+#### You can also run other Sample Programs under examples folder using:
 ```
 cargo run --package ibm_db --example <example_name i.e. connect or list_tables etc.>
 e.g. cargo run --package ibm_db --example connect
