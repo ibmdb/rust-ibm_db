@@ -42,7 +42,12 @@ git clone https://github.com/ibmdb/rust-ibm_db
 cargo run --package ibm_db --example setup
 ```
 
-> NOTE: In order for the test program to run, DSN needs to be configured. Update the db2dsdriver.cfg file(present in /clidriver/cfg folder under CLI driver path) with the requisite details.
+####NOTE: 
+
+In order for the test/db program to run, DSN needs to be configured. 
+Update the db2dsdriver.cfg file(present in /clidriver/cfg folder under CLI driver path) with the requisite details.
+
+Example as follows:
 ```
 e.g.
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
@@ -65,6 +70,7 @@ OR
 Simply include this project in your RUST project.
 
 ####NOTE:
+
 In case it is not already set, add the path of the CLI Driver downloaded as above to your Path on
 Windows/LINUX/MACOS environment variable i.e. IBM_DB_HOME, PATH and LD_LIBRARY_PATH or DYLD_LIBRARY_PATH depending on Windows/LINUX/MACOS
 e.g:
