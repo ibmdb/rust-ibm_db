@@ -1,6 +1,6 @@
 [package]
 name = "ibm_db"
-version = "1.0.0"
+version = "1.0.1"
 authors = ["Binit Kumar <bkumar@rocketsoftware.com>"]
 license = "MIT OR Apache-2.0"
 description = "A tool for DB2 connectivity using CLI Driver"
@@ -55,3 +55,6 @@ odbc-sys = "0.8.2"
 log = "0.4.1"
 encoding_rs = "0.8.14"
 prettytable-rs = "^0.8"
+#Added for connection pooling
+lazy_static = "1.0"
+r2d2 = "0.8"
