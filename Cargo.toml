@@ -1,11 +1,11 @@
 [package]
 name = "ibm_db"
-version = "1.0.1"
+version = "1.0.2"
 authors = ["Binit Kumar <bkumar@rocketsoftware.com>"]
 license = "MIT OR Apache-2.0"
 description = "A tool for DB2 connectivity using CLI Driver"
 readme = "README.md"
-homepage = "https://docs.rs/ibm_db/1.0.0/ibm_db/"
+homepage = "https://docs.rs/ibm_db/1.0.1/ibm_db/"
 repository = "https://github.com/ibmdb/rust-ibm_db"
 keywords = ["cli", "db2", "clidb2", "rustdb2"]
 edition = "2018"

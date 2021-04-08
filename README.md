@@ -1,4 +1,4 @@
-# rust_ibm_db(Beta)
+# rust_ibm_db
 
 Interface for Rust to DB2 for z/OS, DB2 for LUW, DB2 for i with support for Connection Pooling using r2d2.
 
