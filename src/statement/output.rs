@@ -66,7 +66,7 @@ impl<'p> Raii<'p, ffi::Stmt> {
                 if indicator == ffi::SQL_NULL_DATA {
                     Return::Success(None)
                 } else {
-                    if start_pos + indicator as usize <= buffer.len() {
+                    if start_pos + indicator as usize >= buffer.len() {
                         Return::Success(None)
                     }
                     else {
