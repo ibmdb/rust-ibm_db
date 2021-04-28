@@ -1,6 +1,6 @@
 [package]
 name = "ibm_db"
-version = "1.0.2"
+version = "1.0.3"
 authors = ["Binit Kumar <bkumar@rocketsoftware.com>"]
 license = "MIT OR Apache-2.0"
 description = "A tool for DB2 connectivity using CLI Driver"
