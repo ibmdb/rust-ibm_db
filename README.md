@@ -112,3 +112,13 @@ Run the following command(Where replace the <RUST_CRATE_LIB> with the path of yo
 install_name_tool -change libdb2.dylib $IBM_DB_HOME/lib/libdb2.dylib <RUST_CRATE_LIB>/target/debug/ibm_db
 
 ```
+
+<a name='contributing-to-the-ibm_db-RUST-project'></a>
+## Contributing to the ibm_db RUST project
+
+See [CONTRIBUTING](https://github.com/ibmdb/rust-ibm_db/blob/main/CONTRIBUTING.md)
+
+```
+The developer sign-off should include the reference to the DCO in remarks(example below):
+DCO 1.1 Signed-off-by: Random J Developer <random@developer.org>
+```

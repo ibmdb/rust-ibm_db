@@ -66,9 +66,14 @@ impl<'p> Raii<'p, ffi::Stmt> {
                 if indicator == ffi::SQL_NULL_DATA {
                     Return::Success(None)
                 } else {
-                    assert!(start_pos + indicator as usize <= buffer.len(), "no more data but indicatior outside of data buffer");
-                    let slice = &buffer[..(start_pos + indicator as usize)];
-                    Return::Success(Some(T::convert(slice)))
+                    //assert!(start_pos + indicator as usize <= buffer.len(), "no more data but indicatior outside of data buffer");
+                    if start_pos + indicator as usize >= buffer.len() {
+                        Return::Success(None)
+                    }else{
+                        let slice = &buffer[..(start_pos + indicator as usize)];
+                        Return::Success(Some(T::convert(slice)))
+                    }
+
                 }
             }
             ffi::SQL_SUCCESS_WITH_INFO => {
