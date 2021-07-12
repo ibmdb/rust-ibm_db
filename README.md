@@ -23,6 +23,8 @@ Confirm by typing below in command prompt:
 ```
 
 ## How to Install
+
+### Method-1(Using GIT Repo):
 > We'll assume that you've installed Git, forked [rust-ibm_db](https://github.com/ibmdb/rust-ibm_db.git), and cloned the forked repo to your PC.
 >
 > If not, using the command line interface to interact with Git,
@@ -37,10 +39,60 @@ git clone https://github.com/ibmdb/rust-ibm_db
 
 > CLI Driver should be downloaded in your system and IBM_DB_PATH, LD_LIBRARY_PATH should be set to point to CLI Driver folder.
 >
+### Method-2(Downloading ibm_db crate from crates.io):
+> Download the ibm_db crate from crates.io using the below link:
+```
+https://crates.io/api/v1/crates/ibm_db/<version to be downloaded i.e. 1.0.1 or 1.0.2 etc.>/download
+```
+> Once done, unzip the .crate file which is actually a .tar.gz.
+>
+> Copy the setup.rs from "examples" folder to your RUST project under examples folder.
+> 
+> Add the below dependencies in case not present:
+```
+[build-dependencies]
+cc = "1.0"
+winapi = "0.2"
+user32-sys = "0.2"
+sys-info = "0.7.0"
+bitness = "0.4.0"
+error-chain = "0.12.4"
+tempfile = "3.1.0"
+reqwest = "0.10.10"
+tokio = { version = "0.2", features = ["full"] }
+futures = "0.3.8"
+zip = "0.5"
+flate2 = "1.0"
+tar = "0.4"
+
+[dependencies]
+winapi = "0.2"
+user32-sys = "0.2"
+sys-info = "0.7.0"
+bitness = "0.4.0"
+error-chain = "0.12.4"
+tempfile = "3.1.0"
+reqwest = "0.10.10"
+tokio = { version = "0.2", features = ["full"] }
+futures = "0.3.8"
+zip = "0.5"
+flate2 = "1.0"
+tar = "0.4"
+odbc-safe = "0.5.0"
+odbc-sys = "0.8.2"
+log = "0.4.1"
+encoding_rs = "0.8.14"
+prettytable-rs = "^0.8"
+lazy_static = "1.0"
+r2d2 = "0.8"
+```
+> 
 > If CLI Driver is not installed run the below command once you checkout the GIT repo and it will be installed:
 ```
-cargo run --package ibm_db --example setup
+cargo run --package <package name i.e. ibm_db or <your package name>> --example setup
 ```
+
+> Then you can do "cargo install --path ." from ibm_db crate or "cargo install ibm_db" or simply include the "ibm_db" driver in your cargo.toml depending on your convenience. 
 
 #### NOTE: 
 
@@ -76,10 +128,13 @@ Windows/LINUX/MACOS environment variable i.e. IBM_DB_HOME, PATH and LD_LIBRARY_P
 e.g:
 ```
 set PATH = C:/IBM/IBM_DATA_SERVER_DRIVER/clidriver/bin
+set IBM_DB_HOME = C:/IBM/IBM_DATA_SERVER_DRIVER/clidriver
 (or)
 export LD_LIBRARY_PATH = /IBM/IBM_DATA_SERVER_DRIVER/clidriver/bin
+export IBM_DB_HOME = /IBM/IBM_DATA_SERVER_DRIVER/clidriver
 (or)
 export DYLD_LIBRARY_PATH = /IBM/IBM_DATA_SERVER_DRIVER/clidriver/bin
+export IBM_DB_HOME = /IBM/IBM_DATA_SERVER_DRIVER/clidriver
 ```
 
 ### <a name="Licenserequirements"></a> License requirements for connecting to databases

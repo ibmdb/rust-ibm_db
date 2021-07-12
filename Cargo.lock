@@ -580,7 +580,7 @@ dependencies = [
 
 [[package]]
 name = "ibm_db"
-version = "1.0.3"
+version = "1.0.4"
 dependencies = [
  "bitness",
  "cc",
