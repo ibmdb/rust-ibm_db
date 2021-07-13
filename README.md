@@ -24,25 +24,9 @@ Confirm by typing below in command prompt:
 
 ## How to Install If CLI Driver is not installed:
 
-### Method-1(Using GIT Repo):
-> We'll assume that you've installed Git, forked [rust-ibm_db](https://github.com/ibmdb/rust-ibm_db.git), and cloned the forked repo to your PC.
->
-> If not, using the command line interface to interact with Git,
-> you can get the rust driver to your machine by running the below git command i.e.
-```
-git clone https://github.com/ibmdb/rust-ibm_db
-```
->
-> There are also a number of GUIs and IDE integrations that can generally do the same things.
->
-> If you've cloned your fork, then you will be able to reference it with origin in your local repo.
-
-> CLI Driver should be downloaded in your system and IBM_DB_PATH, LD_LIBRARY_PATH should be set to point to CLI Driver folder.
->
-### Method-2(Downloading ibm_db crate from crates.io):
 > Download the ibm_db crate from crates.io using the below link:
 ```
-https://crates.io/api/v1/crates/ibm_db/<version to be downloaded i.e. 1.0.1 or 1.0.2 etc.>/download
+https://crates.io/api/v1/crates/ibm_db/1.0.5/download
 ```
 > Once done, unzip the .crate file which is actually a .tar.gz.
 >
@@ -87,7 +71,7 @@ lazy_static = "1.0"
 r2d2 = "0.8"
 ```
 > 
-> Now, run the below command once you have followed one of the above steps and it will be installed:
+> Now, run the below command once you have followed the above steps and CLI Driver will be installed:
 ```
 cargo run --package <package name i.e. ibm_db or <your package name>> --example setup
 ```
