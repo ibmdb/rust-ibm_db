@@ -22,7 +22,7 @@ Confirm by typing below in command prompt:
 >git --version
 ```
 
-## How to Install
+## How to Install If CLI Driver is not installed:
 
 ### Method-1(Using GIT Repo):
 > We'll assume that you've installed Git, forked [rust-ibm_db](https://github.com/ibmdb/rust-ibm_db.git), and cloned the forked repo to your PC.
@@ -87,7 +87,7 @@ lazy_static = "1.0"
 r2d2 = "0.8"
 ```
 > 
-> If CLI Driver is not installed run the below command once you checkout the GIT repo and it will be installed:
+> Now, run the below command once you have followed one of the above steps and it will be installed:
 ```
 cargo run --package <package name i.e. ibm_db or <your package name>> --example setup
 ```
