@@ -4,7 +4,7 @@ Interface for Rust to DB2 for z/OS, DB2 for LUW, DB2 for i with support for Conn
 
 ## API Documentation
 
-> For complete list of rust_ibm_db APIs refer to ODBC documentation
+> For complete list of rust_ibm_db APIs refer to this link: https://docs.rs/ibm_db/1.0.5/ibm_db/
 
 ## Prerequisite
 
