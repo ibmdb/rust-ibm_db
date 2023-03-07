@@ -6,120 +6,151 @@ Interface for Rust to DB2 for z/OS, DB2 for LUW, DB2 for i with support for Conn
 
 > For complete list of rust_ibm_db APIs refer to this link: https://docs.rs/ibm_db/1.0.5/ibm_db/
 
-## Prerequisite
+## Testing IBM_DB driver on Linux
 
-> RUST should be installed(Rust version should be >=1.45)
-Confirm by typing below in command prompt:
+### Prerequisites
 
+We tested the following steps on an AWS EC2 instance rrunning AL2.
+
+#### Install dependencies
 ```
->rustc --version
-
-```
-> GIT should be installed
-Confirm by typing below in command prompt:
-
-```
->git --version
+# yum -y install gcc unixODBC git openssl-devel
 ```
 
-## How to Install If CLI Driver is not installed:
+#### Install Rust
 
-> Download the ibm_db crate from crates.io using the below link:
 ```
-https://crates.io/api/v1/crates/ibm_db/1.0.5/download
-```
-> Once done, unzip the .crate file which is actually a .tar.gz.
->
-> Copy the setup.rs from "examples" folder to your RUST project under examples folder.
-> 
-> Add the below dependencies in case not present:
-```
-[build-dependencies]
-cc = "1.0"
-winapi = "0.2"
-user32-sys = "0.2"
-sys-info = "0.7.0"
-bitness = "0.4.0"
-error-chain = "0.12.4"
-tempfile = "3.1.0"
-reqwest = "0.10.10"
-tokio = { version = "0.2", features = ["full"] }
-futures = "0.3.8"
-zip = "0.5"
-flate2 = "1.0"
-tar = "0.4"
+$ curl https://sh.rustup.rs -sSf | sh
+$ source ~/.bashrc
 
-[dependencies]
-winapi = "0.2"
-user32-sys = "0.2"
-sys-info = "0.7.0"
-bitness = "0.4.0"
-error-chain = "0.12.4"
-tempfile = "3.1.0"
-reqwest = "0.10.10"
-tokio = { version = "0.2", features = ["full"] }
-futures = "0.3.8"
-zip = "0.5"
-flate2 = "1.0"
-tar = "0.4"
-odbc-safe = "0.5.0"
-odbc-sys = "0.8.2"
-log = "0.4.1"
-encoding_rs = "0.8.14"
-prettytable-rs = "^0.8"
-lazy_static = "1.0"
-r2d2 = "0.8"
-```
-> 
-> Now, run the below command once you have followed the above steps and CLI Driver will be installed:
-```
-cargo run --package <package name i.e. ibm_db or <your package name>> --example setup
+$ cargo --version
+$ rustc --version
+$ git --version
 ```
 
-> Then you can do "cargo install --path ." from ibm_db crate or "cargo install ibm_db" or simply include the "ibm_db" driver in your cargo.toml depending on your convenience. 
+#### Install **clidriver**.
 
-#### NOTE: 
+<pre>
+<b>$ cargo install ibm_db --example setup</B>
 
-In order for the test/db program to run, DSN needs to be configured. 
-Update the db2dsdriver.cfg file(present in /clidriver/cfg folder under CLI driver path) with the requisite details.
+... more ...
+    Finished release [optimized] target(s) in 1m 40s
+  Installing /home/admin/.cargo/bin/setup
+   Installed package `ibm_db v1.0.5` (executable `setup`)
 
-Example as follows:
+<b>$ /home/admin/.cargo/bin/setup</b> 
+</pre>
+
+#### Add entries to profile
+
+<pre><b>
+$ echo "export IBM_DB_HOME=$HOME/clidriver" >> ~/.bashrc
+$ echo 'export LD_LIBRARY_PATH="${IBM_DB_HOME}/lib"' >> ~/.bashrc
+$ echo 'export PATH="${IBM_DB_HOME}/bin":$PATH' >> ~/.bashrc
+$ source ~/.bashrc
+</B></pre>
+
+#### Install **ibm_db**.
+
+<pre><b>
+$ cargo install ibm_db
+</b></pre>
+
+#### Create a Rust package
+
+<pre><b>
+$ cargo new testdb
+</b></pre>
+
+#### Add ibm_db as a dependency to Cargo.toml
+
+<pre><b>
+$ cd testdb
+$ echo 'ibm_db = "1.0.5"' >> Cargo.toml
+</b></pre>
+
+#### Create connection properties using db2cli command
+
+> Note: Change connection properties as per your database endpoints
+
+<pre><b>
+$ cd ~/clidriver/bin
+$ ./db2cli writecfg add \
+-dsn MYDB \
+-database TESTDB \
+-host database-1.xxxxxxx.us-east-1.rds.amazonaws.com \
+-port 50000
+</b></pre>
+
+#### Check db2dsdriver.cfg file
+
+<pre><b>
+cat ~/clidriver/cfg/db2dsdriver.cfg
+</b></pre>
+
+#### Replace ~/testdb/src/main.rs with the following program
+
 ```
-e.g.
-<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<configuration>
-  <dsncollection>
-	<dsn alias="dashdb4" host="test@test.com" name="FOO" port="0000"/>
-	</dsncollection>
+use ibm_db::{safe::AutocommitOn,Statement,create_environment_v3, Connection,ResultSetState::{NoData, Data}};
+use std::error::Error;
 
-  <databases>
-	<database host="test@test.com" name="FOO" port="0000"/>
-	</databases>
+fn main() {
+    match connect() {
+        Ok(()) => println!("Success."),
+        Err(diag) => println!("Error: {}", diag),
+    }
+}
 
-</configuration>
+fn connect() -> Result<(), Box<dyn Error>> {
+
+    let env = create_environment_v3().map_err(|e| e.unwrap())?;
+    let conn = env.connect("MYDB", "admin", "password").unwrap();
+    println!("Connection successful.");
+    execute_statement(&conn)
+}
+
+fn execute_statement<'env>(conn: &Connection<'env, AutocommitOn>) -> Result<(),Box<dyn Error>> {
+    let stmt = Statement::with_parent(conn)?;
+
+    let sql_text = "select current server from sysibm.dual";
+
+    match stmt.exec_direct(&sql_text)? {
+        Data(mut stmt) => {
+            let cols = stmt.num_result_cols()?;
+            while let Some(mut cursor) = stmt.fetch()? {
+                for i in 1..(cols + 1) {
+                    match cursor.get_data::<&str>(i as u16)? {
+                        Some(val) => print!(" {}", val),
+                        None => print!(" NULL"),
+                    }
+                }
+                println!();
+            }
+        }
+        NoData(_) => println!("Query executed, no data returned"),
+    }
+
+    Ok(())
+}
 ```
 
-Include ibm_db in your cargo.toml with latest version from [Crates.io](https://crates.io/crates/ibm_db)
+#### Build and run the program
 
-OR 
+<pre>
+<b>$ cd ~/testdb
+$ cargo build</b>
+... more ...
+   Compiling testdb v0.1.0 (/home/admin/testdb)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.44s
 
-Simply include this project in your RUST project.
+<b>$ ./target/debug/testdb</b>
 
-#### NOTE:
+Connection successful.
+ TESTDB
+Success.
+</pre>
 
-In case it is not already set, add the path of the CLI Driver downloaded as above to your Path on
-Windows/LINUX/MACOS environment variable i.e. IBM_DB_HOME, PATH and LD_LIBRARY_PATH or DYLD_LIBRARY_PATH depending on Windows/LINUX/MACOS
-e.g:
-```
-set PATH = C:/IBM/IBM_DATA_SERVER_DRIVER/clidriver/bin
-set IBM_DB_HOME = C:/IBM/IBM_DATA_SERVER_DRIVER/clidriver
-(or)
-export LD_LIBRARY_PATH = /IBM/IBM_DATA_SERVER_DRIVER/clidriver/bin
-export IBM_DB_HOME = /IBM/IBM_DATA_SERVER_DRIVER/clidriver
-(or)
-export DYLD_LIBRARY_PATH = /IBM/IBM_DATA_SERVER_DRIVER/clidriver/bin
-export IBM_DB_HOME = /IBM/IBM_DATA_SERVER_DRIVER/clidriver
-```
+You successfully tested the Rust program for connecting to the RDS Db2.
 
 ### <a name="Licenserequirements"></a> License requirements for connecting to databases
 
@@ -131,29 +162,8 @@ To know more about server based licensing viz db2connectactivate, follow below l
 * [Activating the license certificate file for DB2 Connect Unlimited Edition](https://www.ibm.com/developerworks/community/blogs/96960515-2ea1-4391-8170-b0515d08e4da/entry/unlimited_licensing_in_non_java_drivers_using_db2connectactivate_utlility1?lang=en).
 * [Unlimited licensing using db2connectactivate utility](https://www.ibm.com/developerworks/community/blogs/96960515-2ea1-4391-8170-b0515d08e4da/entry/unlimited_licensing_in_non_java_drivers_using_db2connectactivate_utlility1?lang=en.)
 
-### How to run sample program:
 
-To run the sample i.e. **main.rs** simply execute:- 
-
-```
-cargo run
-```
-#### You can also run other Sample Programs under examples folder using:
-```
-cargo run --package ibm_db --example <example_name i.e. connect or list_tables etc.>
-e.g. cargo run --package ibm_db --example connect
-```
-## NOTE for MACOS:
-If you get an error i.e. "dyld: Library not loaded: libdb2.dylib"
-Run the following command(Where replace the <RUST_CRATE_LIB> with the path of your rust program root folder):
-
-```
-install_name_tool -change libdb2.dylib $IBM_DB_HOME/lib/libdb2.dylib <RUST_CRATE_LIB>/target/debug/ibm_db
-
-```
-
-<a name='contributing-to-the-ibm_db-RUST-project'></a>
-## Contributing to the ibm_db RUST project
+## Contributing to the <a name='contributing-to-the-ibm_db-RUST-project'>ibm_db</a> RUST project
 
 See [CONTRIBUTING](https://github.com/ibmdb/rust-ibm_db/blob/main/CONTRIBUTING.md)
 
