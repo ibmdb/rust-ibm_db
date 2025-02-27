@@ -23,7 +23,7 @@ fn connect() -> Result<(), Box<dyn Error>> {
     let conn = env.connect_with_connection_string(&buffer)?;*/
 
     //Method-2 for Connection
-    let conn = env.connect("dashdb", "admin", "admin").unwrap();
+    let conn = env.connect("dbname", "dbuser", "dbpass").unwrap();
     execute_statement(&conn)
 }
 
