@@ -4,7 +4,8 @@ use std::thread;
 use ibm_db::{ODBCConnectionManager,Statement,ResultSetState::Data};
 
 fn main() {
-    let manager = ODBCConnectionManager::new("DSN=dashdb;DATABASE=FOO;hostname=test@test.com;PORT=0000;UID=admin;PWD=admin;");
+    // TODO: Update with your actual database connection details
+    let manager = ODBCConnectionManager::new("DRIVER={IBM DB2 ODBC DRIVER};DATABASE=SAMPLE;HOSTNAME=db.example.com;PORT=50000;UID=db_user;PWD=YourPassword123");
     let pool = r2d2::Pool::new(manager).unwrap();
 
     let mut children = vec![];

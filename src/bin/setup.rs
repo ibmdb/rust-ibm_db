@@ -7,8 +7,7 @@ use std::env;
 use std::path::Path;
 use bitness::Bitness;
 use std::fs::File;
-use std::io::{Write, stdout, stdin};
-use futures::executor::block_on;
+use std::io::{Write, stdout, stdin, Read};
 use std::fs;
 use std::io;
 use flate2::read::GzDecoder;
@@ -16,8 +15,7 @@ use tar::Archive;
 
 //Main function called for setup
 #[cfg(not(target_arch = "wasm32"))]
-#[tokio::main]
-async fn main() {
+fn main() {
     let mut env_var_not_present = false;
     env_var_not_present = env::var("IBM_DB_HOME").is_err();
     let mut user_env_path = String::new();
@@ -51,8 +49,11 @@ async fn main() {
             //Add to IBM_DB_HOME environment variable
             env::set_var("IBM_DB_HOME", &env_path);
 
-            //Ask user to add to PATH
-            println!("Please add this path to PATH & IBM_DB_HOME environment variable if not set.");
+            //Inform user to set environment variables properly
+            println!("IBM_DB_HOME is set to: {}", env_path);
+            println!("\nTo use the clidriver in your cargo commands, run your build with IBM_DB_HOME set:");
+            println!("On Windows: cargo run --package ibm_db --example connect");
+            println!("On Unix: IBM_DB_HOME={} cargo run --package ibm_db --example connect", env_path);
             std::process::exit(0)
         }else {
             //If os is windows, check if the os is 32 bit or 64 bit
@@ -114,9 +115,7 @@ async fn main() {
 
             println!("Downloading at {} from {} .......", env_path, file_url);
 
-            let future =
-                download_file(&*env_path, &*file_url);
-            let err = block_on(future);
+            let err = download_file(&*env_path, &*file_url);
 
             //Check if Download Successful.
             //If error print error and details
@@ -142,10 +141,14 @@ async fn main() {
 
             //Set the environment variable
             env_path.push_str("/clidriver");
-            env::set_var("IBM_DB_HOME", env_path);
+            env::set_var("IBM_DB_HOME", &env_path);
             //Validate and then exit
             let env_path_tmp = env::var("IBM_DB_HOME").unwrap_or("Unable to Set Path. Please set.".to_string());
             println!("IBM_DB_HOME set to {}",env_path_tmp);
+            println!("\nNow run your cargo command with IBM_DB_HOME set. For example:");
+            println!("On Windows: cargo run --package ibm_db --example connect");
+            println!("On Unix: IBM_DB_HOME={} cargo run --package ibm_db --example connect", env_path);
+            std::process::exit(0);
         }
     } else {
         if os.contains("Windows") {
@@ -176,8 +179,7 @@ async fn main() {
 
                 println!("Downloading at {} from {} .......", env_path, file_url);
 
-                let future = download_file(&*env_path, &*file_url);
-                let err = block_on(future);
+                let err = download_file(&*env_path, &*file_url);
 
                 //Check if Download Successful.
                 //If error print error and details
@@ -200,15 +202,26 @@ async fn main() {
                     println!("Error while unzipping file");
                     std::process::exit(4)
                 }
-                //Validate and then exit
+                //Update env_path to include /clidriver
+                env_path.push_str("/clidriver");
+                env::set_var("IBM_DB_HOME", &env_path);
+                //Validate and inform user
                 let env_path_tmp = env::var("IBM_DB_HOME").unwrap_or("Unable to Set Path. Please set.".to_string());
-                println!("IBM_DB_HOME set to {}",env_path_tmp);
+                println!("IBM_DB_HOME set to {}", env_path_tmp);
+                println!("\nNow run your cargo command with IBM_DB_HOME set. For example:");
+                println!("cargo run --package ibm_db --example connect");
+                std::process::exit(0);
             }
         } else {
             if Path::new(&value).exists() {
                 println!("clidriver is already present in this path: {}", value);
-                //Ask user to add to PATH
-                println!("Please set CGO_CFLAGS, CGO_LDFLAGS and LD_LIBRARY_PATH or DYLD_LIBRARY_PATH environment variables");
+                env::set_var("IBM_DB_HOME", &env_path);
+                //Inform user to set environment variables properly
+                println!("IBM_DB_HOME is set to: {}", env_path);
+                println!("\nTo use the clidriver in your cargo commands, run your build with IBM_DB_HOME set:");
+                println!("On Unix/Linux/macOS: IBM_DB_HOME={} cargo run --package ibm_db --example connect", env_path);
+                println!("\nAlternatively, add this to your ~/.bashrc or ~/.zshrc:");
+                println!("export IBM_DB_HOME={}", env_path);
                 std::process::exit(0)
             }else{
                 //Follow the above steps of downloading the necessary binary file for linux or mac.
@@ -256,9 +269,7 @@ async fn main() {
 
                 println!("Downloading at {} from {} .......", env_path, file_url);
 
-                let future =
-                    download_file(&*env_path, &*file_url);
-                let err = block_on(future);
+                let err = download_file(&*env_path, &*file_url);
 
                 //Check if Download Successful.
                 //If error print error and details
@@ -277,6 +288,16 @@ async fn main() {
                     println!("Error while unzipping file");
                     std::process::exit(4)
                 }
+                
+                //Set the environment variable
+                env_path.push_str("/clidriver");
+                env::set_var("IBM_DB_HOME", &env_path);
+                println!("IBM_DB_HOME set to {}", env_path);
+                println!("\nNow run your cargo command with IBM_DB_HOME set. For example:");
+                println!("On Unix/Linux/macOS: IBM_DB_HOME={} cargo run --package ibm_db --example connect", env_path);
+                println!("\nAlternatively, add this to your ~/.bashrc or ~/.zshrc:");
+                println!("export IBM_DB_HOME={}", env_path);
+                std::process::exit(0);
             }
         }
 
@@ -285,7 +306,7 @@ async fn main() {
 }
 
 //Function to download the platform specific file
-async fn download_file(env_path: &str, file_url: &str) -> Result<(), Box<dyn std::error::Error>> {
+fn download_file(env_path: &str, file_url: &str) -> Result<(), Box<dyn std::error::Error>> {
     println!("\n\n****************************************\n\
             You are downloading a package which to be used by RUST module for IBM DB2/Informix.  \
             The module is licensed under the Apache License 2.0. \
@@ -299,28 +320,24 @@ async fn download_file(env_path: &str, file_url: &str) -> Result<(), Box<dyn std
             If you do not accept the terms of any license agreement(s), \
             then delete the relevant component(s) from your device.\n****************************************\n"
              ,env_path);
-    let mut response = reqwest::get(file_url).await?;
+    let response = ureq::get(file_url).call()?;
 
-    let mut dest = {
-        let fname = response
-            .url()
-            .path_segments()
-            .and_then(|segments| segments.last())
-            .and_then(|name| if name.is_empty() { None } else { Some(name) })
-            .unwrap_or("tmp.bin");
+    // Extract filename from URL
+    let fname = file_url
+        .split('/')
+        .last()
+        .unwrap_or("tmp.bin");
 
-
-        //Check if the zip file already exists
-        if !Path::new(&env_path).join(fname).exists(){
-            println!("file to download: '{}'", fname);
-            File::create(Path::new(&env_path).join(fname))?
-        } else {
-            println!("file {} already exists.", fname);
-            return Ok(())
-        }
-    };
-    let content =  response.bytes().await?;
-    dest.write_all(&*content)?;
+    //Check if the file already exists
+    if !Path::new(&env_path).join(fname).exists(){
+        println!("file to download: '{}'", fname);
+        let mut dest = File::create(Path::new(&env_path).join(fname))?;
+        let mut content = response.into_reader();
+        std::io::copy(&mut content, &mut dest)?;
+    } else {
+        println!("file {} already exists.", fname);
+    }
+    
     Ok(())
 }
 

@@ -1,6 +1,6 @@
 [package]
 name = "ibm_db"
-version = "1.0.6"
+version = "1.0.7"
 authors = ["Binit Kumar <bkumar@rocketsoftware.com>"]
 license = "MIT OR Apache-2.0"
 description = "A tool for DB2 connectivity using CLI Driver"
@@ -8,7 +8,7 @@ readme = "README.md"
 homepage = "https://docs.rs/ibm_db/1.0.5/ibm_db/"
 repository = "https://github.com/ibmdb/rust-ibm_db"
 keywords = ["cli", "db2", "clidb2", "rustdb2"]
-edition = "2018"
+edition = "2026"
 build = "build.rs"
 links = "db2"
 include = [
@@ -20,6 +20,10 @@ include = [
 name = "ibm_db"
 path = "src/lib.rs"
 
+[[bin]]
+name = "setup"
+path = "src/bin/setup.rs"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 [build-dependencies]
 cc = "1.0"
@@ -29,9 +33,7 @@ sys-info = "0.7.0"
 bitness = "0.4.0"
 error-chain = "0.12.4"
 tempfile = "3.1.0"
-reqwest = "0.10.10"
-tokio = { version = "0.2", features = ["full"] }
-futures = "0.3.8"
+ureq = "2.9"
 zip = "0.5"
 flate2 = "1.0"
 tar = "0.4"
@@ -42,10 +44,7 @@ sys-info = "0.7.0"
 bitness = "0.4.0"
 error-chain = "0.12.4"
 tempfile = "3.1.0"
-reqwest = "0.10.10"
-#reqwest = { version = "0.10", features = ["json"] }
-tokio = { version = "0.2", features = ["full"] }
-futures = "0.3.8"
+ureq = "2.9"
 zip = "0.5"
 flate2 = "1.0"
 tar = "0.4"

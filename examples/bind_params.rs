@@ -7,7 +7,8 @@ fn main() {
 
 fn test_me() -> std::result::Result<(), Box<dyn Error>> {
     let env = create_environment_v3().expect("Can't create ODBC environment");
-    let conn = env.connect("dashdb", "admin", "admin")?;
+    let connection_string = "DRIVER={IBM DB2 ODBC DRIVER};DATABASE=SAMPLE;HOSTNAME=db.example.com;PORT=50000;UID=db_user;PWD=YourPassword123";
+    let conn = env.connect_with_connection_string(connection_string)?;
     let stmt = Statement::with_parent(&conn)?.prepare(
         "select * from test where COL3 = ?",
     )?;

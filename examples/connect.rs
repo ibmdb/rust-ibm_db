@@ -15,15 +15,12 @@ fn connect() -> Result<(), Box<dyn Error>> {
 
     let env = create_environment_v3().map_err(|e| e.unwrap())?;
 
-    //Method-1 for Connection
-    /*let mut buffer = String::new();
-    println!("Please enter connection string: ");
-    io::stdin().read_line(&mut buffer).unwrap();
-
-    let conn = env.connect_with_connection_string(&buffer)?;*/
-
-    //Method-2 for Connection
-    let conn = env.connect("dbname", "dbuser", "dbpass").unwrap();
+    // Direct connection string (no DSN required)
+    // Update HOSTNAME, PORT, and DATABASE with your actual connection details
+    // TODO: Update with your actual database connection details
+    let connection_string = "DRIVER={IBM DB2 ODBC DRIVER};DATABASE=SAMPLE;HOSTNAME=db.example.com;PORT=50000;UID=db_user;PWD=YourPassword123";
+    
+    let conn = env.connect_with_connection_string(connection_string)?;
     execute_statement(&conn)
 }
 
