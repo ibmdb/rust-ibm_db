@@ -3,12 +3,13 @@ mod list_data_sources;
 pub use self::list_data_sources::{DataSourceInfo, DriverInfo};
 use super::{ffi, into_result, safe, try_into_option, DiagnosticRecord, GetDiagRec, Handle, Result};
 use std;
+use std::sync::RwLock;
 
 /// Environment state used to represent that environment has been set to odbc version 3
 pub type Version3 = safe::Odbc3;
 
-pub static mut OS_ENCODING: &encoding_rs::Encoding = encoding_rs::UTF_8;
-pub static mut DB_ENCODING: &encoding_rs::Encoding = encoding_rs::UTF_8;
+pub static OS_ENCODING: RwLock<&encoding_rs::Encoding> = RwLock::new(encoding_rs::UTF_8);
+pub static DB_ENCODING: RwLock<&encoding_rs::Encoding> = RwLock::new(encoding_rs::UTF_8);
 
 /// Handle to an ODBC Environment
 ///
@@ -103,9 +104,7 @@ pub fn create_environment_v3()
 pub fn create_environment_v3_with_os_db_encoding(os_encoding: &str, db_encoding: &str)
                                                  -> std::result::Result<Environment<Version3>, Option<DiagnosticRecord>>
 {
-    unsafe {
-        OS_ENCODING = encoding_rs::Encoding::for_label(os_encoding.as_bytes()).unwrap();
-        DB_ENCODING = encoding_rs::Encoding::for_label(db_encoding.as_bytes()).unwrap();
-    }
+    *OS_ENCODING.write().unwrap() = encoding_rs::Encoding::for_label(os_encoding.as_bytes()).unwrap();
+    *DB_ENCODING.write().unwrap() = encoding_rs::Encoding::for_label(db_encoding.as_bytes()).unwrap();
     Environment::new()
 }

@@ -97,9 +97,9 @@ pub struct ColumnDescriptor {
 
 impl<'a, 'b, S, R, AC: AutocommitMode> Handle for Statement<'a, 'b, S, R, AC> {
     type To = ffi::Stmt;
-    unsafe fn handle(&self) -> ffi::SQLHSTMT {
+    unsafe fn handle(&self) -> ffi::SQLHSTMT { unsafe {
         self.raii.handle()
-    }
+    }}
 }
 
 impl<'a, 'b, S, R, AC: AutocommitMode> Statement<'a, 'b, S, R, AC> {
@@ -298,7 +298,7 @@ impl<'p> Raii<'p, ffi::Stmt> {
                 &mut nullable as *mut ffi::Nullable,
             ) {
                 SQL_SUCCESS => Return::Success(ColumnDescriptor {
-                    name: super::environment::DB_ENCODING.decode(&name_buffer[..(name_length as usize)]).0
+                    name: super::environment::DB_ENCODING.read().unwrap().decode(&name_buffer[..(name_length as usize)]).0
                         .to_string(),
                     data_type: data_type,
                     column_size: if column_size == 0 {
@@ -318,7 +318,7 @@ impl<'p> Raii<'p, ffi::Stmt> {
                     },
                 }),
                 SQL_SUCCESS_WITH_INFO => Return::SuccessWithInfo(ColumnDescriptor {
-                    name: super::environment::DB_ENCODING.decode(&name_buffer[..(name_length as usize)]).0
+                    name: super::environment::DB_ENCODING.read().unwrap().decode(&name_buffer[..(name_length as usize)]).0
                         .to_string(),
                     data_type: data_type,
                     column_size: if column_size == 0 {
@@ -345,7 +345,7 @@ impl<'p> Raii<'p, ffi::Stmt> {
     }
 
     fn exec_direct(&mut self, statement_text: &str) -> Return<bool> {
-        let bytes = unsafe { crate::environment::DB_ENCODING }.encode(statement_text).0;
+        let bytes = crate::environment::DB_ENCODING.read().unwrap().encode(statement_text).0;
 
         let length = bytes.len();
         if length > ffi::SQLINTEGER::max_value() as usize {

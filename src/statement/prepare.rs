@@ -105,7 +105,7 @@ impl<'a, 'b, AC: AutocommitMode> Statement<'a, 'b, Prepared, NoResult, AC> {
 
 impl<'p> Raii<'p, ffi::Stmt> {
     fn prepare(&mut self, sql_text: &str) -> Return<()> {
-        let bytes = unsafe { crate::environment::DB_ENCODING }.encode(sql_text).0;
+        let bytes = crate::environment::DB_ENCODING.read().unwrap().encode(sql_text).0;
         match unsafe {
             ffi::SQLPrepare(
                 self.handle(),

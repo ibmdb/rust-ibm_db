@@ -75,7 +75,7 @@ fn connect(mut dsn : String, mut uid: String, mut pwd: String) -> i32 {
     }
 }
 
-pub unsafe fn dml(conn: i32){
+pub unsafe fn dml(conn: i32){ unsafe {
     let mut cliRC;
 
     println!("Dropping table if it exists.....");
@@ -106,8 +106,8 @@ pub unsafe fn dml(conn: i32){
     } else{
         println!("Fetching Data Result: {}",cliRC);
     }
-}
-pub unsafe fn closeConnection(conn:i32){
+}}
+pub unsafe fn closeConnection(conn:i32){ unsafe {
     println!("Disconnecting ...");
     SQLFreeHandle(SQL_HANDLE_STMT as i16, conn);
     SQLFreeStmt(conn, SQL_UNBIND as u16);
@@ -115,4 +115,4 @@ pub unsafe fn closeConnection(conn:i32){
     SQLFreeStmt(conn, SQL_CLOSE as u16);
     println!("Disconnected Successfully.");
 
-}
+}}

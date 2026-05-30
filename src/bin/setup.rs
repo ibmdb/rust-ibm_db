@@ -7,7 +7,7 @@ use std::env;
 use std::path::Path;
 use bitness::Bitness;
 use std::fs::File;
-use std::io::{Write, stdout, stdin, Read};
+use std::io::{Write, stdout, stdin};
 use std::fs;
 use std::io;
 use flate2::read::GzDecoder;
@@ -47,7 +47,8 @@ fn main() {
             println!("CLI Driver is already present in this path: {}", value);
 
             //Add to IBM_DB_HOME environment variable
-            env::set_var("IBM_DB_HOME", &env_path);
+            // FIXME: Audit that the environment access only happens in single-threaded code.
+            unsafe { env::set_var("IBM_DB_HOME", &env_path) };
 
             //Inform user to set environment variables properly
             println!("IBM_DB_HOME is set to: {}", env_path);
@@ -141,7 +142,8 @@ fn main() {
 
             //Set the environment variable
             env_path.push_str("/clidriver");
-            env::set_var("IBM_DB_HOME", &env_path);
+            // FIXME: Audit that the environment access only happens in single-threaded code.
+            unsafe { env::set_var("IBM_DB_HOME", &env_path) };
             //Validate and then exit
             let env_path_tmp = env::var("IBM_DB_HOME").unwrap_or("Unable to Set Path. Please set.".to_string());
             println!("IBM_DB_HOME set to {}",env_path_tmp);
@@ -204,7 +206,8 @@ fn main() {
                 }
                 //Update env_path to include /clidriver
                 env_path.push_str("/clidriver");
-                env::set_var("IBM_DB_HOME", &env_path);
+                // FIXME: Audit that the environment access only happens in single-threaded code.
+                unsafe { env::set_var("IBM_DB_HOME", &env_path) };
                 //Validate and inform user
                 let env_path_tmp = env::var("IBM_DB_HOME").unwrap_or("Unable to Set Path. Please set.".to_string());
                 println!("IBM_DB_HOME set to {}", env_path_tmp);
@@ -215,7 +218,8 @@ fn main() {
         } else {
             if Path::new(&value).exists() {
                 println!("clidriver is already present in this path: {}", value);
-                env::set_var("IBM_DB_HOME", &env_path);
+                // FIXME: Audit that the environment access only happens in single-threaded code.
+                unsafe { env::set_var("IBM_DB_HOME", &env_path) };
                 //Inform user to set environment variables properly
                 println!("IBM_DB_HOME is set to: {}", env_path);
                 println!("\nTo use the clidriver in your cargo commands, run your build with IBM_DB_HOME set:");
@@ -291,7 +295,8 @@ fn main() {
                 
                 //Set the environment variable
                 env_path.push_str("/clidriver");
-                env::set_var("IBM_DB_HOME", &env_path);
+                // FIXME: Audit that the environment access only happens in single-threaded code.
+                unsafe { env::set_var("IBM_DB_HOME", &env_path) };
                 println!("IBM_DB_HOME set to {}", env_path);
                 println!("\nNow run your cargo command with IBM_DB_HOME set. For example:");
                 println!("On Unix/Linux/macOS: IBM_DB_HOME={} cargo run --package ibm_db --example connect", env_path);

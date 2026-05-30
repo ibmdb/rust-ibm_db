@@ -161,10 +161,11 @@ impl Environment<Version3> {
     ) -> Result<Option<(::std::borrow::Cow<'a, str>, ::std::borrow::Cow<'b, str>)>> {
         let result = f(&mut self.safe, direction, buf1, buf2);
         match try_into_option(result, self)? {
-            Some((len1, len2)) => unsafe {
+            Some((len1, len2)) => {
+                let encoding = super::super::environment::DB_ENCODING.read().unwrap();
                 Ok(Some((
-                    super::super::environment::DB_ENCODING.decode(&buf1[0..(len1 as usize)]).0,
-                    super::super::environment::DB_ENCODING.decode(&buf2[0..(len2 as usize)]).0,
+                    encoding.decode(&buf1[0..(len1 as usize)]).0,
+                    encoding.decode(&buf2[0..(len2 as usize)]).0,
                 )))
             }
             None => Ok(None),
