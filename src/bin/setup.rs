@@ -81,8 +81,13 @@ fn main() {
                     Bitness::X86_64 => 64,
                     _ => { 0 }
                 };
-                println!("This is a {} os & {} bit system.", os, os_arch);
-                if os_arch == 64 {
+                // Check if running on ARM64 (Apple Silicon)
+                let is_arm = cfg!(target_arch = "aarch64");
+
+                println!("This is a {} os & {} bit system. ARM is {}", os, os_arch, is_arm);
+                if is_arm {
+                    cli_file_name = "macarm64_odbc_cli.tar.gz";
+                } else if os_arch == 64 {
                     cli_file_name = "macos64_odbc_cli.tar.gz";
                 } else {
                     println!("Unknown/Unsupported platform.");
@@ -242,8 +247,14 @@ fn main() {
                         Bitness::X86_64 => 64,
                         _ => { 0 }
                     };
-                    println!("This is a {} os & {} bit system.", os, os_arch);
-                    if os_arch == 64 {
+                    
+                    // Check if running on ARM64 (Apple Silicon)
+                    let is_arm = cfg!(target_arch = "aarch64");
+                    
+                    println!("This is a {} os & {} bit system. ARM is {}", os, os_arch, is_arm);
+                    if is_arm {
+                        cli_file_name = "macarm64_odbc_cli.tar.gz";
+                    } else if os_arch == 64 {
                         cli_file_name = "macos64_odbc_cli.tar.gz";
                     } else {
                         println!("Unknown/Unsupported platform.");
