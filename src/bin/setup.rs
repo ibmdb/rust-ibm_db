@@ -47,7 +47,8 @@ fn main() {
             println!("CLI Driver is already present in this path: {}", value);
 
             //Add to IBM_DB_HOME environment variable
-            // FIXME: Audit that the environment access only happens in single-threaded code.
+            // SAFETY: This setup binary runs single-threaded in main() and exits immediately.
+            // No concurrent access to environment variables is possible.
             unsafe { env::set_var("IBM_DB_HOME", &env_path) };
 
             //Inform user to set environment variables properly
@@ -142,7 +143,8 @@ fn main() {
 
             //Set the environment variable
             env_path.push_str("/clidriver");
-            // FIXME: Audit that the environment access only happens in single-threaded code.
+            // SAFETY: This setup binary runs single-threaded in main() and exits immediately.
+            // No concurrent access to environment variables is possible.
             unsafe { env::set_var("IBM_DB_HOME", &env_path) };
             //Validate and then exit
             let env_path_tmp = env::var("IBM_DB_HOME").unwrap_or("Unable to Set Path. Please set.".to_string());
@@ -206,7 +208,8 @@ fn main() {
                 }
                 //Update env_path to include /clidriver
                 env_path.push_str("/clidriver");
-                // FIXME: Audit that the environment access only happens in single-threaded code.
+                // SAFETY: This setup binary runs single-threaded in main() and exits immediately.
+                // No concurrent access to environment variables is possible.
                 unsafe { env::set_var("IBM_DB_HOME", &env_path) };
                 //Validate and inform user
                 let env_path_tmp = env::var("IBM_DB_HOME").unwrap_or("Unable to Set Path. Please set.".to_string());
@@ -218,7 +221,8 @@ fn main() {
         } else {
             if Path::new(&value).exists() {
                 println!("clidriver is already present in this path: {}", value);
-                // FIXME: Audit that the environment access only happens in single-threaded code.
+                // SAFETY: This setup binary runs single-threaded in main() and exits immediately.
+                // No concurrent access to environment variables is possible.
                 unsafe { env::set_var("IBM_DB_HOME", &env_path) };
                 //Inform user to set environment variables properly
                 println!("IBM_DB_HOME is set to: {}", env_path);
@@ -295,7 +299,8 @@ fn main() {
                 
                 //Set the environment variable
                 env_path.push_str("/clidriver");
-                // FIXME: Audit that the environment access only happens in single-threaded code.
+                // SAFETY: This setup binary runs single-threaded in main() and exits immediately.
+                // No concurrent access to environment variables is possible.
                 unsafe { env::set_var("IBM_DB_HOME", &env_path) };
                 println!("IBM_DB_HOME set to {}", env_path);
                 println!("\nNow run your cargo command with IBM_DB_HOME set. For example:");
