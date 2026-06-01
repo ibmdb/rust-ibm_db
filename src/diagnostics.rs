@@ -109,9 +109,7 @@ impl<D> GetDiagRec for D
                     native_error: result.native_error,
                     message_length,
                     message,
-                    message_string: unsafe {
-                        super::environment::OS_ENCODING.decode(&message[0..message_length as usize]).0.into_owned()
-                    },
+                    message_string: super::environment::OS_ENCODING.read().unwrap().decode(&message[0..message_length as usize]).0.into_owned(),
                 })
             }
             NoData(()) => None,

@@ -20,14 +20,14 @@ fn test_me() -> std::result::Result<(), Box<dyn Error>> {
     let stmt = stmt.bind_parameter(3, &param)?;
     let stmt = stmt.bind_parameter(4, &param)?;*/
 
-    let stmt = if let Data(mut stmt) = stmt.execute()? {
+    let stmt = match stmt.execute()? { Data(mut stmt) => {
         if let Some(mut cursor) = stmt.fetch()? {
             println!("{}", cursor.get_data::<String>(1)?.unwrap());
         }
         stmt.close_cursor()?
-    } else {
+    } _ => {
         panic!("SELECT statement returned no result set");
-    };
+    }};
 
     let stmt = stmt.reset_parameters()?;
 
@@ -36,14 +36,14 @@ fn test_me() -> std::result::Result<(), Box<dyn Error>> {
     let stmt = stmt.bind_parameter(1, &param)?;
     let stmt = stmt.bind_parameter(2, &param)?;
 
-    let stmt = if let Data(mut stmt) = stmt.execute()? {
+    let stmt = match stmt.execute()? { Data(mut stmt) => {
         if let Some(mut cursor) = stmt.fetch()? {
             println!("{}", cursor.get_data::<String>(1)?.unwrap());
         }
         stmt.close_cursor()?
-    } else {
+    } _ => {
         panic!("SELECT statement returned no result set");
-    };
+    }};
     stmt.reset_parameters().unwrap();
 
     Ok(())
