@@ -140,8 +140,8 @@ cargo run --bin setup
 
 **What happens:**
 - ✅ Detects your operating system (Windows / Linux / macOS)
-- ✅ Detects your system architecture (32-bit / 64-bit)
-- ✅ Downloads the appropriate IBM DB2 CLI Driver
+- ✅ Detects your system architecture (32-bit / 64-bit / ARM64)
+- ✅ Downloads the appropriate IBM DB2 CLI Driver (including Apple Silicon/ARM support)
 - ✅ Extracts the files to your system
 - ✅ Sets up environment variables (see next step)
 
@@ -392,7 +392,7 @@ Edit `Cargo.toml` and add:
 
 ```toml
 [dependencies]
-ibm_db = "1.0.6"
+ibm_db = "1.0.8"
 ```
 
 ### Step 3: Write Code to Connect
@@ -681,7 +681,7 @@ rust-ibm_db/
 **A:** The setup utility automates this, but if it fails: Check your internet, ensure you have 500MB free disk space, and see Troubleshooting section.
 
 ### Q: Can I use this on macOS?
-**A:** Yes! Ensure you install OpenSSL via Homebrew and set the LDFLAGS/CPPFLAGS environment variables.
+**A:** Yes! Both Intel and Apple Silicon (M1/M2/M3/M4) Macs are supported. The setup utility automatically detects your architecture and downloads the correct CLI driver. Ensure you install OpenSSL via Homebrew and set the LDFLAGS/CPPFLAGS environment variables.
 
 ### Q: Do I need to set environment variables in every terminal?
 **A:** No, if you make the changes permanent (see Configuration section), they'll persist.
